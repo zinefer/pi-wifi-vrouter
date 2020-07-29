@@ -9,7 +9,7 @@
         ];
 
         preg_match('/ESSID:"([^"]+)"/', $signal, $matches);
-        $out['ssid'] = $matches[1];
+        $out['ssid'] = stripcslashes($matches[1]);
 
         preg_match('/\(Channel (\d{1,2})\)/', $signal, $matches);
         $out['channel'] = $matches[1];
