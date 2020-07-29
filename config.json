@@ -1,0 +1,28 @@
+{
+    "wifi": {
+        "client": {
+            "ssid":      "",
+            "pass":      ""
+        },
+        "ap": {
+            "ssid":      "pi-wifi-vrouter",
+            "pass":      "password",
+            "ip":        "",
+            "dns":       "",
+            "forward":   false
+        }
+    },
+    "wireguard": {
+        "interface": {
+            "priv":      "",
+            "pub":       "",
+            "address":   ""
+        },
+        "peer": {
+            "endpoint":  "",
+            "pub":       "",
+            "preshared": "",
+            "address":   ""
+        }
+    }
+}
