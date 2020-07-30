@@ -23,7 +23,6 @@
         return $out;
     }
 
-
     $output = shell_exec('sudo iwlist ap0 scan');
 
     $signals = preg_split('/Cell \d{2} - Address: [\dA-F:]{17}/m', $output);
@@ -39,7 +38,7 @@
     }
     
     foreach ($networks as $network) { ?>
-        <li class="list-group-item d-flex justify-content-between lh-condensed">
+        <li class="list-group-item d-flex justify-content-around lh-condensed">
 
             <? if ($network['encrypted']) { ?>
                 <div class="bi bi-lock-fill"></div>
@@ -47,10 +46,10 @@
                 <div class="bi bi-unlock-fill"></div>
             <? } ?>
 
-            <div>
-                <h6 class="my-0"><?= $network['ssid'] ?></h6>
+            <div class="mr-auto">
+                <h6 class="ssid my-0"><?= $network['ssid'] ?></h6>
                 <small class="text-muted">Channel <?= $network['channel'] ?></small>
             </div>
-            <span class="text-muted"><?= $network['rssi'] ?></span>
+            <span class="text-muted mt-2"><?= $network['rssi'] ?></span>
         </li>
 <?php } ?>

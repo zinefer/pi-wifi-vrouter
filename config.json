@@ -9,14 +9,14 @@
             "pass":      "password",
             "ip":        "",
             "dns":       "",
-            "forward":   false
+            "forward":   true
         }
     },
     "wireguard": {
         "interface": {
             "priv":      "",
-            "pub":       "",
-            "address":   ""
+            "address":   "",
+            "dns":       ""
         },
         "peer": {
             "endpoint":  "",
