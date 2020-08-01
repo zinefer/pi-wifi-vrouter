@@ -35,32 +35,47 @@ if (!isset($config['wireguard'])) {
 }
 
 $config['wireguard']['interface']['priv']    = $_POST['wireguard-interface-priv'];
-$config['wireguard']['interface']['pub']     = $_POST['wireguard-interface-pub'];
 $config['wireguard']['interface']['address'] = $_POST['wireguard-interface-address'];
+$config['wireguard']['interface']['dns']     = $_POST['wireguard-interface-dns'];
 
 $config['wireguard']['peer']['endpoint']  = $_POST['wireguard-peer-endpoint'];
 $config['wireguard']['peer']['pub']       = $_POST['wireguard-peer-pub'];
 $config['wireguard']['peer']['preshared'] = $_POST['wireguard-peer-preshared'];
 $config['wireguard']['peer']['address']   = $_POST['wireguard-peer-address'];
 
-$file = fopen('config.json','w+');
-fwrite($file, json_encode($config));
-fclose($file);
+file_put_contents('config.json', json_encode($config));
 
-$cmd = '/bin/rpi-wifi.sh -a ' + $config['wifi']['ap']['ssid'] + ' ' + $config['wifi']['ap']['pass'] + ' -c ' + $config['wifi']['client']['ssid'] + ' ' + $config['wifi']['client']['pass']
+
+// https://github.com/lukicdarkoo/rpi-wifi
+$cmd  = 'curl https://raw.githubusercontent.com/lukicdarkoo/rpi-wifi/master/configure | bash -s --';
+$args = '-a ' . $config['wifi']['ap']['ssid'] . ' ' . $config['wifi']['ap']['pass'] . ' -c ' . $config['wifi']['client']['ssid'] . ' ' . $config['wifi']['client']['pass'];
 
 if ($config['wifi']['ap']['forward']) {
-  $cmd += ' --no-internet'
+  $args .= ' --no-internet';
 }
 
 if (strlen($config['wifi']['ap']['ip']) > 0) {
-  $cmd += ' -i ' + $config['wifi']['ap']['ip']
+  $args .= ' -i ' . $config['wifi']['ap']['ip'];
 }
 
-exec($cmd);
+//exec($cmd . ' ' . $args);
 
-//
-// /bin/rpi-wifi.sh -a MyAP myappass -c WifiSSID wifipass
-//
+$sock = stream_socket_client('unix:///run/vrouter-config', $errno, $errst);
+fwrite($sock, json_encode($config) . PHP_EOL);
+fclose($sock);
+
+
+file_put_contents('/etc/wireguard/wg0.conf', <<<EOT
+[Interface]
+Address = {$config['wireguard']['interface']['address']}/24
+DNS = {$config['wireguard']['interface']['dns']}
+SaveConfig = true
+PrivateKey = {$config['wireguard']['interface']['priv']}
+
+[Peer]
+PublicKey = {$config['wireguard']['peer']['pub']}
+Endpoint = {$config['wireguard']['peer']['endpoint']}
+AllowedIPs = {$config['wireguard']['peer']['address']}
+EOT);
 
 header("Location: /");
